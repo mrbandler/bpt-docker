@@ -1,5 +1,4 @@
 #!/bin/bash
 
-VERSION="1.5.1"
-
+source .env
 docker build -t bpt:latest -t bpt:$VERSION .
