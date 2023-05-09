@@ -20,11 +20,17 @@ LABEL Version="${VERSION}"
 LABEL docker.cmd="docker run -it mrbandler/bpt:${VERSION} -mode=UploadBinary -help"
 
 # Update and install dependencies.
-RUN apt update && apt install wget xdg-user-dirs -y
+RUN apt update && apt install sudo wget xdg-user-dirs -y
 
-# Create non root user.
+# Create new user as BPT expects a non-root user to execute the binary.
+# NOTE: The user is allowed to execute sudo commands without password which is
+#       necessary for CI/CD applications of the image.
 RUN adduser bpt
+RUN usermod -aG sudo bpt
+RUN echo 'bpt ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
 USER bpt
+
+# Change working directory to the newly created user home.
 WORKDIR /home/bpt
 
 # Copy downloaded and unzipped BPT from builder.
